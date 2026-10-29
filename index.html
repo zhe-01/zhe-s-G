@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线小游戏合集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* 头部样式 */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        /* 游戏选择区 */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 210, 255, 0.2);
+            border-color: #00d2ff;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .game-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .game-card p {
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        /* 游戏容器 */
+        .game-container {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #00d2ff;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .game-info span {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 20px;
+            border-radius: 8px;
+        }
+
+        /* 游戏画布区域 */
+        .game-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 2px solid #00d2ff;
+            border-radius: 8px;
+            background: #0a0a1a;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+        }
+
+        /* 控制按钮 */
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 2048 样式 */
+        .grid-2048 {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            grid-template-rows: repeat(4, 80px);
+            gap: 10px;
+            background: #bbada0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .cell {
+            background: rgba(238, 228, 218, 0.35);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #776e65;
+            transition: all 0.15s;
+        }
+
+        .cell-2 { background: #eee4da; }
+        .cell-4 { background: #ede0c8; }
+        .cell-8 { background: #f2b179; color: #f9f6f2; }
+        .cell-16 { background: #f59563; color: #f9f6f2; }
+        .cell-32 { background: #f67c5f; color: #f9f6f2; }
+        .cell-64 { background: #f65e3b; color: #f9f6f2; }
+        .cell-128 { background: #edcf72; color: #f9f6f2; font-size: 1.5rem; }
+        .cell-256 { background: #edcc61; color: #f9f6f2; font-size: 1.5rem; }
+        .cell-512 { background: #edc850; color: #f9f6f2; font-size: 1.5rem; }
+        .cell-1024 { background: #edc53f; color: #f9f6f2; font-size: 1.2rem; }
+        .cell-2048 { background: #edc22e; color: #f9f6f2; font-size: 1.2rem; }
+
+        /* 井字棋样式 */
+        .tic-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            background: #00d2ff;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .tic-cell {
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tic-cell:hover {
+            background: #2a2a4e;
+        }
+
+        .tic-x { color: #ff6b6b; }
+        .tic-o { color: #4ecdc4; }
+
+        /* 移动端方向键 */
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .dpad {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .dpad button {
+            background: rgba(0, 210, 255, 0.3);
+            border: 1px solid #00d2ff;
+            color: #fff;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .dpad button:active {
+            background: #00d2ff;
+        }
+
+        .dpad-up { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-down { grid-column: 2; grid-row: 3; }
+
+        @media (max-width: 600px) {
+            .mobile-controls {
+                display: block;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .game-grid {
+                padding: 20px;
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 游戏结束弹窗 */
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .game-over.active {
+            display: flex;
+        }
+
+        .game-over-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid #00d2ff;
+        }
+
+        .game-over h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #00d2ff;
+        }
+
+        .game-over p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎮 在线小游戏合集</h1>
+        <p>纯 HTML 实现，即开即玩</p>
+    </header>
+
+    <!-- 游戏选择主页 -->
+    <div id="home" class="game-grid">
+        <div class="game-card" onclick="showGame('snake')">
+            <div class="game-icon">🐍</div>
+            <h3>贪吃蛇</h3>
+            <p>方向键控制，吃食物变长</p>
+        </div>
+        <div class="game-card" onclick="showGame('game2048')">
+            <div class="game-icon">🔢</div>
+            <h3>2048</h3>
+            <p>合并数字，挑战高分</p>
+        </div>
+        <div class="game-card" onclick="showGame('breakout')">
+            <div class="game-icon">🧱</div>
+            <h3>打砖块</h3>
+            <p>控制挡板，击碎所有砖块</p>
+        </div>
+        <div class="game-card" onclick="showGame('tictactoe')">
+            <div class="game-icon">⭕</div>
+            <h3>井字棋</h3>
+            <p>双人对战，三子连线获胜</p>
+        </div>
+    </div>
+
+    <!-- 贪吃蛇游戏 -->
+    <div id="snake-game" class="game-container">
+        <div class="back-btn" onclick="backToHome()">← 返回游戏列表</div>
+        <h2 class="game-title">🐍 贪吃蛇</h2>
+        <div class="game-info">
+            <span>得分: <span id="snake-score">0</span></span>
+            <span>最高分: <span id="snake-high">0</span></span>
+        </div>
+        <div class="game-area">
+            <canvas id="snake-canvas" width="400" height="400"></canvas>
+        </div>
+        <div class="controls">
+            <button class="btn btn-primary" onclick="startSnake()">开始游戏</button>
+            <button class="btn btn-secondary" onclick="pauseSnake()">暂停</button>
+        </div>
+        <div class="mobile-controls">
+            <div class="dpad">
+                <button class="dpad-up" onclick="changeDirection('up')">↑</button>
+                <button class="dpad-left" onclick="changeDirection('left')">←</button>
+                <button class="dpad-right" onclick="changeDirection('right')">→</button>
+                <button class="dpad-down" onclick="changeDirection('down')">↓</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2048游戏 -->
+    <div id="game2048-game" class="game-container">
+        <div class="back-btn" onclick="backToHome()">← 返回游戏列表</div>
+        <h2 class="game-title">🔢 2048</h2>
+        <div class="game-info">
+            <span>得分: <span id="score-2048">0</span></span>
+            <span>最高分: <span id="high-2048">0</span></span>
+        </div>
+        <div class="game-area">
+            <div class="grid-2048" id="grid-2048"></div>
+        </div>
+        <div class="controls">
+            <button class="btn btn-primary" onclick="init2048()">重新开始</button>
+        </div>
+        <p style="text-align:center;color:#aaa;margin-top:15px;">使用方向键或滑动屏幕移动方块</p>
+    </div>
+
+    <!-- 打砖块游戏 -->
+    <div id="breakout-game" class="game-container">
+        <div class="back-btn" onclick="backToHome()">← 返回游戏列表</div>
+        <h2 class="game-title">🧱 打砖块</h2>
+        <div class="game-info">
+            <span>得分: <span id="break-score">0</span></span>
+            <span>生命: <span id="break-lives">3</span></span>
+        </div>
+        <div class="game-area">
+            <canvas id="break-canvas" width="480" height="320"></canvas>
+        </div>
+        <div class="controls">
+            <button class="btn btn-primary" onclick="startBreakout()">开始游戏</button>
+            <button class="btn btn-secondary" onclick="pauseBreakout()">暂停</button>
+        </div>
+        <p style="text-align:center;color:#aaa;margin-top:15px;">← → 方向键控制挡板，空格键发射</p>
+    </div>
+
+    <!-- 井字棋游戏 -->
+    <div id="tictactoe-game" class="game-container">
+        <div class="back-btn" onclick="backToHome()">← 返回游戏列表</div>
+        <h2 class="game-title">⭕ 井字棋</h2>
+        <div class="game-info">
+            <span>当前玩家: <span id="current-player" class="tic-x">X</span></span>
+        </div>
+        <div class="game-area">
+            <div class="tic-grid" id="tic-grid"></div>
+        </div>
+        <div class="controls">
+            <button class="btn btn-primary" onclick="initTic()">重新开始</button>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div class="game-over" id="game-over">
+        <div class="game-over-content">
+            <h2 id="over-title">游戏结束</h2>
+            <p id="over-text">你的得分: 0</p>
+            <button class="btn btn-primary" onclick="closeOver()">确定</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 纯 HTML 小游戏合集 | 所有游戏均由原生 JavaScript 实现</p>
+        <p>阿哲</p>
+    </footer>
+
+    <script>
+        // ========== 页面切换 ==========
+        function showGame(game) {
+            document.getElementById('home').style.display = 'none';
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(game + '-game').classList.add('active');
+            
+            // 初始化对应游戏
+            if (game === 'snake') initSnake();
+            if (game === 'game2048') init2048();
+            if (game === 'breakout') initBreakout();
+            if (game === 'tictactoe') initTic();
+        }
+
+        function backToHome() {
+            // 停止所有游戏
+            stopAllGames();
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('home').style.display = 'grid';
+        }
+
+        function stopAllGames() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            if (breakInterval) clearInterval(breakInterval);
+        }
+
+        function showOver(title, text) {
+            document.getElementById('over-title').textContent = title;
+            document.getElementById('over-text').textContent = text;
+            document.getElementById('game-over').classList.add('active');
+        }
+
+        function closeOver() {
+            document.getElementById('game-over').classList.remove('active');
+        }
+
+        // ========== 贪吃蛇游戏 ==========
+        let snakeCanvas, snakeCtx;
+        let snakeInterval;
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let nextDirection = 'right';
+        let snakeScore = 0;
+        let snakeHigh = localStorage.getItem('snakeHigh') || 0;
+        const gridSize = 20;
+        const tileCount = 20;
+
+        function initSnake() {
+            snakeCanvas = document.getElementById('snake-canvas');
+            snakeCtx = snakeCanvas.getContext('2d');
+            document.getElementById('snake-high').textContent = snakeHigh;
+            resetSnake();
+            drawSnake();
+        }
+
+        function resetSnake() {
+            snake = [{x: 10, y: 10}];
+            direction = 'right';
+            nextDirection = 'right';
+            snakeScore = 0;
+            document.getElementById('snake-score').textContent = snakeScore;
+            spawnFood();
+        }
+
+        function spawnFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+            // 确保食物不在蛇身上
+            for (let seg of snake) {
+                if (seg.x === food.x && seg.y === food.y) {
+                    spawnFood();
+                    return;
+                }
+            }
+        }
+
+        function startSnake() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            resetSnake();
+            snakeInterval = setInterval(gameLoopSnake, 120);
+        }
+
+        function pauseSnake() {
+            if (snakeInterval) {
+                clearInterval(snakeInterval);
+                snakeInterval = null;
+            }
+        }
+
+        function gameLoopSnake() {
+            direction = nextDirection;
+            
+            // 移动蛇头
+            let head = {x: snake[0].x, y: snake[0].y};
+            switch(direction) {
+                case 'up': head.y--; break;
+                case 'down': head.y++; break;
+                case 'left': head.x--; break;
+                case 'right': head.x++; break;
+            }
+
+            // 撞墙检测
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOverSnake();
+                return;
+            }
+
+            // 撞自己检测
+            for (let seg of snake) {
+                if (head.x === seg.x && head.y === seg.y) {
+                    gameOverSnake();
+                    return;
+                }
+            }
+
+            snake.unshift(head);
+
+            // 吃食物
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore += 10;
+                document.getElementById('snake-score').textContent = snakeScore;
+                spawnFood();
+            } else {
+                snake.pop();
+            }
+
+            drawSnake();
+        }
+
+        function drawSnake() {
+            // 清空画布
+            snakeCtx.fillStyle = '#0a0a1a';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+            // 画网格
+            snakeCtx.strokeStyle = 'rgba(0, 210, 255, 0.1)';
+            for (let i = 0; i <= tileCount; i++) {
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(i * gridSize, 0);
+                snakeCtx.lineTo(i * gridSize, snakeCanvas.height);
+                snakeCtx.stroke();
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(0, i * gridSize);
+                snakeCtx.lineTo(snakeCanvas.width, i * gridSize);
+                snakeCtx.stroke();
+            }
+
+            // 画食物
+            snakeCtx.fillStyle = '#ff6b6b';
+            snakeCtx.beginPath();
+            snakeCtx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2 - 2, 0, Math.PI * 2);
+            snakeCtx.fill();
+
+            // 画蛇
+            snake.forEach((seg, index) => {
+                if (index === 0) {
+                    snakeCtx.fillStyle = '#00d2ff';
+                } else {
+                    const alpha = 1 - (index / snake.length) * 0.5;
+                    snakeCtx.fillStyle = `rgba(0, 210, 255, ${alpha})`;
+                }
+                snakeCtx.fillRect(seg.x * gridSize + 1, seg.y * gridSize + 1, gridSize - 2, gridSize - 2);
+            });
+        }
+
+        function gameOverSnake() {
+            clearInterval(snakeInterval);
+            snakeInterval = null;
+            if (snakeScore > snakeHigh) {
+                snakeHigh = snakeScore;
+                localStorage.setItem('snakeHigh', snakeHigh);
+                document.getElementById('snake-high').textContent = snakeHigh;
+            }
+            showOver('游戏结束', `最终得分: ${snakeScore}`);
+        }
+
+        function changeDirection(dir) {
+            const opposites = {up: 'down', down: 'up', left: 'right', right: 'left'};
+            if (opposites[dir] !== direction) {
+                nextDirection = dir;
+            }
+        }
+
+        // ========== 2048游戏 ==========
+        let grid2048 = [];
+        let score2048 = 0;
+        let high2048 = localStorage.getItem('high2048') || 0;
+
+        function init2048() {
+            grid2048 = Array(4).fill(null).map(() => Array(4).fill(0));
+            score2048 = 0;
+            document.getElementById('score-2048').textContent = score2048;
+            document.getElementById('high-2048').textContent = high2048;
+            addRandomTile();
+            addRandomTile();
+            render2048();
+        }
+
+        function addRandomTile() {
+            let empty = [];
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (grid2048[i][j] === 0) empty.push({i, j});
+                }
+            }
+            if (empty.length > 0) {
+                let pos = empty[Math.floor(Math.random() * empty.length)];
+                grid2048[pos.i][pos.j] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function render2048() {
+            const gridEl = document.getElementById('grid-2048');
+            gridEl.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let cell = document.createElement('div');
+                    let val = grid2048[i][j];
+                    cell.className = 'cell' + (val ? ' cell-' + val : '');
+                    cell.textContent = val || '';
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function move2048(direction) {
+            let moved = false;
+            let oldGrid = JSON.stringify(grid2048);
+
+            if (direction === 'left' || direction === 'right') {
+                for (let i = 0; i < 4; i++) {
+                    let row = grid2048[i];
+                    if (direction === 'right') row.reverse();
+                    row = slideAndMerge(row);
+                    if (direction === 'right') row.reverse();
+                    grid2048[i] = row;
+                }
+            } else {
+                for (let j = 0; j < 4; j++) {
+                    let col = [];
+                    for (let i = 0; i < 4; i++) col.push(grid2048[i][j]);
+                    if (direction === 'down') col.reverse();
+                    col = slideAndMerge(col);
+                    if (direction === 'down') col.reverse();
+                    for (let i = 0; i < 4; i++) grid2048[i][j] = col[i];
+                }
+            }
+
+            if (JSON.stringify(grid2048) !== oldGrid) {
+                addRandomTile();
+                render2048();
+                document.getElementById('score-2048').textContent = score2048;
+                if (score2048 > high2048) {
+                    high2048 = score2048;
+                    localStorage.setItem('high2048', high2048);
+                    document.getElementById('high-2048').textContent = high2048;
+                }
+                checkGameOver2048();
+            }
+        }
+
+        function slideAndMerge(arr) {
+            // 移除0
+            arr = arr.filter(x => x !== 0);
+            // 合并
+            for (let i = 0; i < arr.length - 1; i++) {
+                if (arr[i] === arr[i+1]) {
+                    arr[i] *= 2;
+                    score2048 += arr[i];
+                    arr.splice(i+1, 1);
+                }
+            }
+            // 补0
+            while (arr.length < 4) arr.push(0);
+            return arr;
+        }
+
+        function checkGameOver2048() {
+            // 检查是否有空位
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (grid2048[i][j] === 0) return;
+                }
+            }
+            // 检查是否可合并
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (j < 3 && grid2048[i][j] === grid2048[i][j+1]) return;
+                    if (i < 3 && grid2048[i][j] === grid2048[i+1][j]) return;
+                }
+            }
+            showOver('游戏结束', `最终得分: ${score2048}`);
+        }
+
+        // ========== 打砖块游戏 ==========
+        let breakCanvas, breakCtx;
+        let breakInterval;
+        let paddle = {x: 200, width: 80, height: 10};
+        let ball = {x: 240, y: 250, dx: 3, dy: -3, radius: 6};
+        let bricks = [];
+        let breakScore = 0;
+        let breakLives = 3;
+        let ballLaunched = false;
+
+        function initBreakout() {
+            breakCanvas = document.getElementById('break-canvas');
+            breakCtx = breakCanvas.getContext('2d');
+            resetBreakout();
+            drawBreakout();
+        }
+
+        function resetBreakout() {
+            paddle.x = 200;
+            ball.x = 240;
+            ball.y = 250;
+            ball.dx = 3;
+            ball.dy = -3;
+            ballLaunched = false;
+            breakScore = 0;
+            breakLives = 3;
+            document.getElementById('break-score').textContent = breakScore;
+            document.getElementById('break-lives').textContent = breakLives;
+            
+            // 初始化砖块
+            bricks = [];
+            const rows = 5;
+            const cols = 8;
+            const brickWidth = 50;
+            const brickHeight = 20;
+            const padding = 8;
+            const offsetTop = 30;
+            const offsetLeft = 15;
+            
+            const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    bricks.push({
+                        x: offsetLeft + c * (brickWidth + padding),
+                        y: offsetTop + r * (brickHeight + padding),
+                        width: brickWidth,
+                        height: brickHeight,
+                        color: colors[r],
+                        alive: true
+                    });
+                }
+            }
+        }
+
+        function startBreakout() {
+            if (breakInterval) clearInterval(breakInterval);
+            resetBreakout();
+            breakInterval = setInterval(gameLoopBreakout, 16);
+        }
+
+        function pauseBreakout() {
+            if (breakInterval) {
+                clearInterval(breakInterval);
+                breakInterval = null;
+            }
+        }
+
+        function gameLoopBreakout() {
+            if (!ballLaunched) {
+                ball.x = paddle.x + paddle.width / 2;
+            } else {
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                // 墙壁碰撞
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > breakCanvas.width) {
+                    ball.dx = -ball.dx;
+                }
+                if (ball.y - ball.radius < 0) {
+                    ball.dy = -ball.dy;
+                }
+
+                // 挡板碰撞
+                if (ball.y + ball.radius > breakCanvas.height - 20 &&
+                    ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+                    ball.dy = -ball.dy;
+                    // 根据击中位置调整角度
+                    let hitPos = (ball.x - paddle.x) / paddle.width;
+                    ball.dx = (hitPos - 0.5) * 6;
+                }
+
+                // 掉落
+                if (ball.y > breakCanvas.height) {
+                    breakLives--;
+                    document.getElementById('break-lives').textContent = breakLives;
+                    if (breakLives <= 0) {
+                        gameOverBreakout(false);
+                        return;
+                    }
+                    ballLaunched = false;
+                    ball.x = paddle.x + paddle.width / 2;
+                    ball.y = 250;
+                    ball.dx = 3;
+                    ball.dy = -3;
+                }
+
+                // 砖块碰撞
+                for (let brick of bricks) {
+                    if (!brick.alive) continue;
+                    if (ball.x > brick.x && ball.x < brick.x + brick.width &&
+                        ball.y - ball.radius < brick.y + brick.height &&
+                        ball.y + ball.radius > brick.y) {
+                        brick.alive = false;
+                        ball.dy = -ball.dy;
+                        breakScore += 10;
+                        document.getElementById('break-score').textContent = breakScore;
+                        
+                        // 检查胜利
+                        if (bricks.every(b => !b.alive)) {
+                            gameOverBreakout(true);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            drawBreakout();
+        }
+
+        function drawBreakout() {
+            // 清空
+            breakCtx.fillStyle = '#0a0a1a';
+            breakCtx.fillRect(0, 0, breakCanvas.width, breakCanvas.height);
+
+            // 画砖块
+            for (let brick of bricks) {
+                if (!brick.alive) continue;
+                breakCtx.fillStyle = brick.color;
+                breakCtx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                breakCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+                breakCtx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+            }
+
+            // 画挡板
+            breakCtx.fillStyle = '#00d2ff';
+            breakCtx.fillRect(paddle.x, breakCanvas.height - 20, paddle.width, paddle.height);
+
+            // 画球
+            breakCtx.fillStyle = '#fff';
+            breakCtx.beginPath();
+            breakCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            breakCtx.fill();
+        }
+
+        function gameOverBreakout(win) {
+            clearInterval(breakInterval);
+            breakInterval = null;
+            showOver(win ? '🎉 恭喜通关！' : '游戏结束', `最终得分: ${breakScore}`);
+        }
+
+        // ========== 井字棋游戏 ==========
+        let ticBoard = [];
+        let currentPlayer = 'X';
+        let gameActive = true;
+
+        function initTic() {
+            ticBoard = Array(9).fill('');
+            currentPlayer = 'X';
+            gameActive = true;
+            document.getElementById('current-player').textContent = currentPlayer;
+            document.getElementById('current-player').className = 'tic-x';
+            renderTic();
+        }
+
+        function renderTic() {
+            const grid = document.getElementById('tic-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                let cell = document.createElement('div');
+                cell.className = 'tic-cell';
+                if (ticBoard[i]) {
+                    cell.textContent = ticBoard[i];
+                    cell.classList.add(ticBoard[i] === 'X' ? 'tic-x' : 'tic-o');
+                }
+                cell.onclick = () => makeMove(i);
+                grid.appendChild(cell);
+            }
+        }
+
+        function makeMove(index) {
+            if (!gameActive || ticBoard[index]) return;
+            
+            ticBoard[index] = currentPlayer;
+            renderTic();
+
+            // 检查获胜
+            const winPatterns = [
+                [0,1,2], [3,4,5], [6,7,8], // 行
+                [0,3,6], [1,4,7], [2,5,8], // 列
+                [0,4,8], [2,4,6]           // 对角线
+            ];
+
+            for (let pattern of winPatterns) {
+                if (ticBoard[pattern[0]] && 
+                    ticBoard[pattern[0]] === ticBoard[pattern[1]] && 
+                    ticBoard[pattern[0]] === ticBoard[pattern[2]]) {
+                    gameActive = false;
+                    showOver('游戏结束', `玩家 ${currentPlayer} 获胜！`);
+                    return;
+                }
+            }
+
+            // 检查平局
+            if (!ticBoard.includes('')) {
+                gameActive = false;
+                showOver('游戏结束', '平局！');
+                return;
+            }
+
+            // 切换玩家
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            let playerEl = document.getElementById('current-player');
+            playerEl.textContent = currentPlayer;
+            playerEl.className = currentPlayer === 'X' ? 'tic-x' : 'tic-o';
+        }
+
+        // ========== 键盘事件 ==========
+        document.addEventListener('keydown', (e) => {
+            // 贪吃蛇
+            if (document.getElementById('snake-game').classList.contains('active')) {
+                switch(e.key) {
+                    case 'ArrowUp': changeDirection('up'); e.preventDefault(); break;
+                    case 'ArrowDown': changeDirection('down'); e.preventDefault(); break;
+                    case 'ArrowLeft': changeDirection('left'); e.preventDefault(); break;
+                    case 'ArrowRight': changeDirection('right'); e.preventDefault(); break;
+                    case ' ': startSnake(); e.preventDefault(); break;
+                }
+            }
+
+            // 2048
+            if (document.getElementById('game2048-game').classList.contains('active')) {
+                switch(e.key) {
+                    case 'ArrowUp': move2048('up'); e.preventDefault(); break;
+                    case 'ArrowDown': move2048('down'); e.preventDefault(); break;
+                    case 'ArrowLeft': move2048('left'); e.preventDefault(); break;
+                    case 'ArrowRight': move2048('right'); e.preventDefault(); break;
+                }
+            }
+
+            // 打砖块
+            if (document.getElementById('breakout-game').classList.contains('active')) {
+                switch(e.key) {
+                    case 'ArrowLeft': 
+                        paddle.x = Math.max(0, paddle.x - 20); 
+                        e.preventDefault(); 
+                        break;
+                    case 'ArrowRight': 
+                        paddle.x = Math.min(breakCanvas.width - paddle.width, paddle.x + 20); 
+                        e.preventDefault(); 
+                        break;
+                    case ' ': 
+                        if (!ballLaunched) ballLaunched = true; 
+                        e.preventDefault(); 
+                        break;
+                }
+            }
+        });
+
+        // ========== 触摸滑动支持（2048） ==========
+        let touchStartX, touchStartY;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!touchStartX || !touchStartY) return;
+            
+            let touchEndX = e.changedTouches[0].clientX;
+            let touchEndY = e.changedTouches[0].clientY;
+            
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
+
+            if (Math.abs(diffX) < 30 && Math.abs(diffY) < 30) return;
+
+            if (document.getElementById('game2048-game').classList.contains('active')) {
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    move2048(diffX > 0 ? 'right' : 'left');
+                } else {
+                    move2048(diffY > 0 ? 'down' : 'up');
+                }
+            }
+
+            touchStartX = null;
+            touchStartY = null;
+        });
+
+        // 打砖块鼠标/触摸控制
+        document.getElementById('break-canvas')?.addEventListener('mousemove', (e) => {
+            if (!breakInterval) return;
+            const rect = breakCanvas.getBoundingClientRect();
+            paddle.x = e.clientX - rect.left - paddle.width / 2;
+            paddle.x = Math.max(0, Math.min(breakCanvas.width - paddle.width, paddle.x));
+        });
+    </script>
+</body>
+</html>
